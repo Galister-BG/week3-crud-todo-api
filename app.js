@@ -14,6 +14,12 @@ app.get('/todos', (req, res) => {
 
 // POST New – Create
 app.post('/todos', (req, res) => {
+  if (!req.body.task) {
+    return res.status(400).json({ error: 'Task is required!' });
+  }  // tast is required validation
+  if (req.body.completed === undefined) {
+    req.body.completed = false;
+  } // set default completed to false if not provided
   const newTodo = { id: todos.length + 1, ...req.body }; // Auto-ID
   todos.push(newTodo);
   res.status(201).json(newTodo); // Echo back
@@ -22,7 +28,7 @@ app.post('/todos', (req, res) => {
 // PATCH Update – Partial
 app.patch('/todos/:id', (req, res) => {
   const todo = todos.find((t) => t.id === parseInt(req.params.id)); // Array.find()
-  if (!todo) return res.status(404).json({ message: 'Todo not found' });
+  if (!todo) return res.status(404).json({ message: 'Todo not found' });      
   Object.assign(todo, req.body); // Merge: e.g., {completed: true}
   res.status(200).json(todo);
 });
@@ -42,9 +48,23 @@ app.get('/todos/completed', (req, res) => {
   res.json(completed); // Custom Read!
 });
 
+//filter false completed todos
+app.get('/todos/pending', (req, res) => {
+  const pending = todos.filter((t) => !t.completed);
+  res.json(pending); // Custom Read!
+});
+
+app.get('/todos/:id', (req, res) => {
+  const todo = todos.find((t) => t.id === parseInt(req.params.id));
+  if (!todo) return res.status(404).json({ message: 'Todo not found' });
+  res.status(200).json(todo);
+});  // get single todo by id
+
 app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Server error!' });
 });
 
-const PORT = 3002;
-app.listen(PORT, () => console.log(`Server on port ${PORT}`));
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
+});
