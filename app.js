@@ -1,5 +1,6 @@
 const express = require('express');
 const app = express();
+const cors = require('cors'); // Import CORS middleware
 app.use(express.json()); // Parse JSON bodies
 
 let todos = [
@@ -64,7 +65,7 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Server error!' });
 });
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
